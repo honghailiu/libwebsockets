@@ -1032,6 +1032,9 @@ set(LIB_LIST)
 #
 # ZLIB (Only needed for deflate extensions).
 #
+
+set (ADD_INTERNAL_ZLIB 0)
+
 if (LWS_WITH_ZLIB)
 	if (LWS_WITH_BUNDLED_ZLIB)
 		if (WIN32)
@@ -1051,7 +1054,7 @@ if (LWS_WITH_ZLIB)
 				${WIN32_ZLIB_PATH}/trees.c
 				${WIN32_ZLIB_PATH}/uncompr.c
 				${WIN32_ZLIB_PATH}/zutil.c)
-			add_library(zlib_internal STATIC ${ZLIB_SRCS})
+			set(ADD_INTERNAL_ZLIB 1)
 			set(ZLIB_INCLUDE_DIRS ${WIN32_ZLIB_PATH})
 			get_property(ZLIB_LIBRARIES TARGET zlib_internal PROPERTY LOCATION)
 			set(ZLIB_FOUND 1)
@@ -1260,6 +1263,11 @@ CHECK_FUNCTION_EXISTS(TLS_client_method LWS_HAVE_TLS_CLIENT_METHOD)
 CHECK_FUNCTION_EXISTS(TLSv1_2_client_method LWS_HAVE_TLSV1_2_CLIENT_METHOD)
 endif()
 set(CMAKE_REQUIRED_LIBRARIES ${temp})
+
+if (ADD_INTERNAL_ZLIB)
+	add_library(zlib_internal STATIC ${ZLIB_SRCS})
+endif()
+
 # Generate the lws_config.h that includes all the public compilation settings.
 configure_file(
        "${PROJECT_SOURCE_DIR}/cmake/lws_config.h.in"
